@@ -32,31 +32,33 @@ export default function Planner() {
   };
 
   return (
-    <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
+    <div className="bg-white/60 backdrop-blur-xl rounded-[2.5rem] p-6 md:p-8 shadow-2xl border border-white/40">
       <div className="flex items-start justify-between mb-6">
         <div>
-          <h2 className="text-lg font-semibold text-slate-800 mb-1">Weekplanner</h2>
-          <p className="text-sm text-slate-500">Klik op een vak en daarna op een dag om in te plannen.</p>
+          <h2 className="text-xl font-bold text-slate-800 mb-1">Weekplanner</h2>
+          <p className="text-sm text-slate-600 font-medium">Klik op een vak en daarna op een dag om in te plannen.</p>
         </div>
       </div>
 
       {/* Smart Tip */}
-      <div className="bg-amber-50 border border-amber-100 rounded-xl p-3 mb-6 flex items-center gap-3 text-amber-700 text-sm">
-        <Lightbulb className="w-5 h-5 text-amber-500 shrink-0" />
+      <div className="bg-white/50 backdrop-blur-md border border-white/60 rounded-2xl p-4 mb-6 flex items-center gap-3 text-slate-700 text-sm shadow-sm">
+        <div className="bg-amber-100 p-2 rounded-xl shrink-0">
+          <Lightbulb className="w-5 h-5 text-amber-600" />
+        </div>
         <p className="font-medium">{tip}</p>
       </div>
 
       {/* Subjects Palette */}
-      <div className="flex flex-wrap gap-2 mb-6">
+      <div className="flex flex-wrap gap-2 mb-8 bg-white/40 p-3 rounded-2xl border border-white/50">
         {DEFAULT_SUBJECTS.map(subject => (
           <button
             key={subject.id}
             onClick={() => setSelectedSubject(selectedSubject?.id === subject.id ? null : subject)}
             className={cn(
-              "px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5",
+              "px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-1.5",
               subject.color,
               "text-white shadow-sm hover:shadow-md",
-              selectedSubject?.id === subject.id ? "ring-2 ring-offset-2 ring-slate-800 scale-105" : "opacity-90 hover:opacity-100"
+              selectedSubject?.id === subject.id ? "ring-4 ring-offset-2 ring-white/50 scale-105" : "opacity-90 hover:opacity-100 hover:-translate-y-0.5"
             )}
           >
             {subject.name}
@@ -65,7 +67,7 @@ export default function Planner() {
       </div>
 
       {/* Weekly Grid */}
-      <div className="grid grid-cols-7 gap-2 sm:gap-4">
+      <div className="grid grid-cols-7 gap-2 sm:gap-3">
         {DAYS.map(day => {
           const daySubjects = (plan[day] || []).map(id => DEFAULT_SUBJECTS.find(s => s.id === id)).filter(Boolean) as Subject[];
           
@@ -74,11 +76,13 @@ export default function Planner() {
               key={day}
               onClick={() => selectedSubject && toggleSubjectForDay(day, selectedSubject.id)}
               className={cn(
-                "min-h-[120px] rounded-2xl border-2 p-2 transition-colors flex flex-col gap-1.5",
-                selectedSubject ? "cursor-pointer hover:border-slate-300 border-dashed border-slate-200" : "border-slate-100 bg-slate-50/50"
+                "min-h-[140px] rounded-2xl border-2 p-2 transition-all flex flex-col gap-1.5",
+                selectedSubject 
+                  ? "cursor-pointer hover:border-slate-400 border-dashed border-slate-300 bg-white/30" 
+                  : "border-white/50 bg-white/40 shadow-sm"
               )}
             >
-              <div className="text-center text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+              <div className="text-center text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 bg-white/50 py-1 rounded-lg">
                 {day}
               </div>
               
@@ -90,7 +94,7 @@ export default function Planner() {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8 }}
                     className={cn(
-                      "text-xs font-medium text-white px-2 py-1.5 rounded-md flex justify-between items-center group",
+                      "text-xs font-bold text-white px-2 py-2 rounded-xl flex justify-between items-center group shadow-sm",
                       subject.color
                     )}
                   >
@@ -100,7 +104,7 @@ export default function Planner() {
                         e.stopPropagation();
                         toggleSubjectForDay(day, subject.id);
                       }}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 rounded-full p-0.5"
                     >
                       <X className="w-3 h-3" />
                     </button>
@@ -110,7 +114,7 @@ export default function Planner() {
 
               {selectedSubject && !daySubjects.find(s => s.id === selectedSubject.id) && (
                 <div className="mt-auto flex justify-center opacity-0 hover:opacity-100 transition-opacity">
-                  <Plus className="w-4 h-4 text-slate-400" />
+                  <Plus className="w-5 h-5 text-slate-500 bg-white/50 rounded-full p-0.5" />
                 </div>
               )}
             </div>

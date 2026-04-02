@@ -39,19 +39,19 @@ export default function DailyCheckIn() {
   };
 
   return (
-    <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-semibold text-slate-800">Dagelijkse Check-in</h2>
-        <div className="flex bg-slate-100 p-1 rounded-full">
+    <div className="bg-white/60 backdrop-blur-xl rounded-[2.5rem] p-6 md:p-8 shadow-2xl border border-white/40">
+      <div className="flex items-center justify-between mb-8">
+        <h2 className="text-xl font-bold text-slate-800">Dagelijkse Check-in</h2>
+        <div className="flex bg-white/50 backdrop-blur-md p-1.5 rounded-full shadow-sm border border-white/60">
           <button 
             onClick={() => setIsEvening(false)}
-            className={cn("px-4 py-1.5 rounded-full text-sm font-medium transition-colors flex items-center gap-2", !isEvening ? "bg-white shadow-sm text-slate-800" : "text-slate-500")}
+            className={cn("px-5 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-2", !isEvening ? "bg-white shadow-sm text-slate-800" : "text-slate-500 hover:text-slate-700")}
           >
             <Sun className="w-4 h-4" /> Ochtend
           </button>
           <button 
             onClick={() => setIsEvening(true)}
-            className={cn("px-4 py-1.5 rounded-full text-sm font-medium transition-colors flex items-center gap-2", isEvening ? "bg-white shadow-sm text-slate-800" : "text-slate-500")}
+            className={cn("px-5 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-2", isEvening ? "bg-white shadow-sm text-slate-800" : "text-slate-500 hover:text-slate-700")}
           >
             <Moon className="w-4 h-4" /> Avond
           </button>
@@ -60,14 +60,14 @@ export default function DailyCheckIn() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Morning Section */}
-        <div className={cn("transition-opacity duration-300", isEvening ? "opacity-50 pointer-events-none" : "opacity-100")}>
-          <h3 className="font-medium text-slate-700 mb-4 flex items-center gap-2">
+        <div className={cn("transition-all duration-500", isEvening ? "opacity-40 pointer-events-none scale-95" : "opacity-100 scale-100")}>
+          <h3 className="font-bold text-slate-800 mb-5 flex items-center gap-2">
             Mijn 3 prioriteiten vandaag
           </h3>
-          <div className="space-y-3">
+          <div className="space-y-4">
             {[0, 1, 2].map((index) => (
               <div key={index} className="flex items-center gap-3">
-                <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold shrink-0">
+                <div className="w-8 h-8 rounded-xl bg-blue-500/20 text-blue-700 flex items-center justify-center text-sm font-bold shrink-0 border border-white/40 shadow-inner">
                   {index + 1}
                 </div>
                 <input
@@ -75,7 +75,7 @@ export default function DailyCheckIn() {
                   value={checkIn.priorities[index]}
                   onChange={(e) => updatePriority(index, e.target.value)}
                   placeholder={`Prioriteit ${index + 1}...`}
-                  className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition-all text-sm"
+                  className="flex-1 px-5 py-3 rounded-2xl bg-white/80 border-2 border-white/60 focus:ring-4 focus:ring-blue-400/30 focus:border-blue-500 outline-none transition-all text-sm font-medium text-slate-800 placeholder:text-slate-400 shadow-sm"
                   tabIndex={isEvening ? -1 : 0}
                 />
               </div>
@@ -84,20 +84,20 @@ export default function DailyCheckIn() {
         </div>
 
         {/* Evening Section */}
-        <div className={cn("transition-opacity duration-300", !isEvening ? "opacity-50 pointer-events-none" : "opacity-100")}>
-          <h3 className="font-medium text-slate-700 mb-4 flex items-center gap-2">
+        <div className={cn("transition-all duration-500", !isEvening ? "opacity-40 pointer-events-none scale-95" : "opacity-100 scale-100")}>
+          <h3 className="font-bold text-slate-800 mb-5 flex items-center gap-2">
             Hoe ging het vandaag?
           </h3>
           
-          <div className="bg-slate-50 p-6 rounded-2xl">
-            <div className="flex justify-between items-center mb-2">
+          <div className="bg-white/50 backdrop-blur-md p-8 rounded-[2rem] border border-white/60 shadow-sm">
+            <div className="flex justify-between items-center mb-4">
               {MOODS.map((mood) => (
                 <button
                   key={mood.value}
                   onClick={() => updateMood(mood.value)}
                   className={cn(
-                    "text-4xl transition-all hover:scale-110",
-                    checkIn.mood === mood.value ? "scale-125 drop-shadow-md" : "opacity-50 grayscale"
+                    "text-5xl transition-all hover:scale-110 hover:-translate-y-1",
+                    checkIn.mood === mood.value ? "scale-125 drop-shadow-xl" : "opacity-50 grayscale hover:grayscale-0"
                   )}
                   tabIndex={!isEvening ? -1 : 0}
                   title={mood.label}
@@ -106,7 +106,7 @@ export default function DailyCheckIn() {
                 </button>
               ))}
             </div>
-            <div className="flex justify-between text-xs font-medium text-slate-400 px-2 mt-4">
+            <div className="flex justify-between text-sm font-bold text-slate-500 px-2 mt-6">
               <span>Zwaar</span>
               <span>Geweldig</span>
             </div>
@@ -116,7 +116,7 @@ export default function DailyCheckIn() {
             <motion.p 
               initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-center text-sm font-medium text-slate-600 mt-4"
+              className="text-center text-sm font-bold text-green-700 mt-6 bg-green-500/20 py-2 px-4 rounded-full inline-block mx-auto border border-white/40 shadow-sm"
             >
               Opgeslagen! Goed gedaan vandaag. 🎉
             </motion.p>
@@ -126,3 +126,4 @@ export default function DailyCheckIn() {
     </div>
   );
 }
+

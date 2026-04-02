@@ -149,7 +149,7 @@ export default function Pomodoro() {
           key={plantStage}
           initial={{ scale: 0.5, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
-          className="text-8xl drop-shadow-lg"
+          className="text-8xl drop-shadow-2xl"
         >
           {PLANT_STAGES[plantStage]}
         </motion.div>
@@ -157,10 +157,10 @@ export default function Pomodoro() {
 
       {/* Timer */}
       <div className="text-center mb-8">
-        <div className="text-7xl font-bold text-slate-800 font-mono tracking-tighter mb-2">
+        <div className="text-7xl md:text-8xl font-bold text-slate-800 font-mono tracking-tighter mb-2 drop-shadow-sm">
           {formatTime(timeLeft)}
         </div>
-        <p className="text-slate-400 text-sm font-medium">
+        <p className="text-slate-600 font-medium bg-white/40 px-4 py-1.5 rounded-full inline-block backdrop-blur-sm">
           {isActive ? 'Blijf gefocust...' : 'Klaar om te starten?'}
         </p>
       </div>
@@ -170,10 +170,10 @@ export default function Pomodoro() {
         <button
           onClick={toggleTimer}
           className={cn(
-            "flex items-center gap-2 px-8 py-4 rounded-2xl font-bold text-lg transition-all shadow-sm hover:shadow-md",
+            "flex items-center gap-2 px-8 py-4 rounded-2xl font-bold text-lg transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5",
             isActive 
-              ? "bg-orange-100 text-orange-700 hover:bg-orange-200" 
-              : "bg-slate-900 text-white hover:bg-slate-800"
+              ? "bg-orange-100/90 text-orange-700 hover:bg-orange-200 backdrop-blur-md" 
+              : "bg-slate-900/90 text-white hover:bg-slate-800 backdrop-blur-md"
           )}
         >
           {isActive ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
@@ -182,7 +182,7 @@ export default function Pomodoro() {
         
         <button
           onClick={resetTimer}
-          className="p-4 rounded-2xl bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors"
+          className="p-4 rounded-2xl bg-white/50 text-slate-700 hover:bg-white/80 transition-all shadow-sm hover:shadow-md backdrop-blur-md"
           title="Reset"
         >
           <RotateCcw className="w-6 h-6" />
@@ -192,45 +192,45 @@ export default function Pomodoro() {
   );
 
   return (
-    <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col items-center relative overflow-hidden min-h-[400px]">
+    <div className="bg-white/60 backdrop-blur-xl rounded-[2.5rem] p-8 shadow-2xl border border-white/40 flex flex-col items-center relative overflow-hidden min-h-[500px]">
       {/* Background Pulse if active */}
       {isActive && !pipWindow && (
         <motion.div 
-          className="absolute inset-0 bg-blue-50/50"
-          animate={{ opacity: [0.3, 0.6, 0.3] }}
-          transition={{ duration: 2, repeat: Infinity }}
+          className="absolute inset-0 bg-green-500/10"
+          animate={{ opacity: [0.2, 0.5, 0.2] }}
+          transition={{ duration: 3, repeat: Infinity }}
         />
       )}
 
       <div className="relative z-10 w-full h-full flex flex-col">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-slate-700">Focus Garden</h2>
-          <div className="flex gap-2 bg-slate-100 p-1 rounded-full">
+          <h2 className="text-xl font-bold text-slate-800">Focus Garden</h2>
+          <div className="flex gap-2 bg-white/50 backdrop-blur-md p-1.5 rounded-full shadow-sm border border-white/60">
             <button 
               onClick={() => handleSound('silence')}
-              className={cn("p-2 rounded-full transition-colors", sound === 'silence' ? "bg-white shadow-sm text-slate-800" : "text-slate-400 hover:text-slate-600")}
+              className={cn("p-2.5 rounded-full transition-all", sound === 'silence' ? "bg-white shadow-sm text-slate-800" : "text-slate-500 hover:text-slate-800 hover:bg-white/40")}
               title="Stilte"
             >
               <VolumeX className="w-4 h-4" />
             </button>
             <button 
               onClick={() => handleSound('rain')}
-              className={cn("p-2 rounded-full transition-colors", sound === 'rain' ? "bg-blue-100 text-blue-600 shadow-sm" : "text-slate-400 hover:text-slate-600")}
+              className={cn("p-2.5 rounded-full transition-all", sound === 'rain' ? "bg-blue-100 text-blue-600 shadow-sm" : "text-slate-500 hover:text-slate-800 hover:bg-white/40")}
               title="Regen"
             >
               <CloudRain className="w-4 h-4" />
             </button>
             <button 
               onClick={() => handleSound('coffee')}
-              className={cn("p-2 rounded-full transition-colors", sound === 'coffee' ? "bg-orange-100 text-orange-600 shadow-sm" : "text-slate-400 hover:text-slate-600")}
+              className={cn("p-2.5 rounded-full transition-all", sound === 'coffee' ? "bg-orange-100 text-orange-600 shadow-sm" : "text-slate-500 hover:text-slate-800 hover:bg-white/40")}
               title="Koffiehuis"
             >
               <Coffee className="w-4 h-4" />
             </button>
-            <div className="w-px h-6 bg-slate-200 mx-1 self-center" />
+            <div className="w-px h-6 bg-slate-300/50 mx-1 self-center" />
             <button 
               onClick={togglePiP}
-              className={cn("p-2 rounded-full transition-colors", pipWindow ? "bg-purple-100 text-purple-600 shadow-sm" : "text-slate-400 hover:text-slate-600")}
+              className={cn("p-2.5 rounded-full transition-all", pipWindow ? "bg-purple-100 text-purple-600 shadow-sm" : "text-slate-500 hover:text-slate-800 hover:bg-white/40")}
               title="Picture in Picture"
             >
               <PictureInPicture className="w-4 h-4" />
@@ -239,10 +239,10 @@ export default function Pomodoro() {
         </div>
 
         {pipWindow ? (
-          <div className="flex-1 flex items-center justify-center text-slate-400 flex-col gap-4">
+          <div className="flex-1 flex items-center justify-center text-slate-600 flex-col gap-4 bg-white/30 rounded-3xl m-4 border border-white/40">
             <PictureInPicture className="w-12 h-12 opacity-50" />
-            <p>Timer is geopend in een apart venster.</p>
-            <button onClick={togglePiP} className="text-blue-500 underline text-sm">Sluit venster</button>
+            <p className="font-medium">Timer is geopend in een apart venster.</p>
+            <button onClick={togglePiP} className="text-blue-600 hover:text-blue-700 underline font-medium">Sluit venster</button>
             {createPortal(<TimerContent />, pipWindow.document.body)}
           </div>
         ) : (
