@@ -39,6 +39,7 @@ const BACKGROUNDS = [
 export default function Dashboard({ profile, setProfile, theme, setTheme }: Props) {
   const [activeTab, setActiveTab] = useState(TABS[0].id);
   const [showBgPicker, setShowBgPicker] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const { background, setBackground } = useAppStore();
 
   const today = new Date().toLocaleDateString('nl-NL', {
@@ -88,28 +89,78 @@ export default function Dashboard({ profile, setProfile, theme, setTheme }: Prop
                 Hoi, {profile.name}!
               </span>
               <button 
-                onClick={() => setShowBgPicker(true)}
+                onClick={() => setShowSettings(true)}
                 className="p-2.5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/80 dark:hover:bg-white/20 bg-white/40 dark:bg-black/30 rounded-full transition-all shadow-sm border border-white/20 dark:border-white/5"
-                title="Achtergrond aanpassen"
-              >
-                <ImageIcon className="w-5 h-5" />
-              </button>
-              <button 
-                onClick={toggleTheme}
-                className="p-2.5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/80 dark:hover:bg-white/20 bg-white/40 dark:bg-black/30 rounded-full transition-all shadow-sm border border-white/20 dark:border-white/5"
-                title="Wissel Thema"
-              >
-                {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-              </button>
-              <button 
-                onClick={handleLogout}
-                className="p-2.5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/80 dark:hover:bg-white/20 bg-white/40 dark:bg-black/30 rounded-full transition-all shadow-sm border border-white/20 dark:border-white/5"
-                title="Instellingen / Uitloggen"
+                title="Instellingen"
               >
                 <Settings className="w-5 h-5" />
               </button>
             </div>
           </header>
+
+          {/* Settings Modal */}
+          <AnimatePresence>
+            {showSettings && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+                  onClick={() => setShowSettings(false)}
+                />
+                <motion.div 
+                  initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                  animate={{ scale: 1, opacity: 1, y: 0 }}
+                  exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                  className="relative bg-white dark:bg-slate-900 rounded-3xl p-6 max-w-md w-full shadow-2xl border border-slate-100 dark:border-slate-800"
+                >
+                  <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                      <Settings className="w-5 h-5" /> Instellingen
+                    </h3>
+                    <button onClick={() => setShowSettings(false)} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <button 
+                      onClick={() => {
+                        setShowSettings(false);
+                        setShowBgPicker(true);
+                      }}
+                      className="w-full flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                    >
+                      <span className="flex items-center gap-3 font-medium text-slate-700 dark:text-slate-200">
+                        <ImageIcon className="w-5 h-5 text-blue-500" /> Achtergrond aanpassen
+                      </span>
+                    </button>
+                    
+                    <button 
+                      onClick={toggleTheme}
+                      className="w-full flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                    >
+                      <span className="flex items-center gap-3 font-medium text-slate-700 dark:text-slate-200">
+                        {theme === 'light' ? <Moon className="w-5 h-5 text-indigo-500" /> : <Sun className="w-5 h-5 text-yellow-500" />} 
+                        Thema wisselen
+                      </span>
+                      <span className="text-sm text-slate-500 capitalize">{theme}</span>
+                    </button>
+
+                    <button 
+                      onClick={handleLogout}
+                      className="w-full flex items-center justify-between p-4 rounded-2xl bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors mt-8"
+                    >
+                      <span className="flex items-center gap-3 font-medium text-red-600 dark:text-red-400">
+                        Uitloggen / Reset
+                      </span>
+                    </button>
+                  </div>
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>
 
           {/* Background Picker Modal */}
           <AnimatePresence>
