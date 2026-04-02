@@ -1,0 +1,5 @@
+{
+  "name": "StudyFlow",
+  "description": "Een interactieve studie-dashboard voor middelbare scholieren met Pomodoro, Focus Garden, en slimme planning.",
+  "requestFramePermissions": []
+}
