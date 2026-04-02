@@ -8,6 +8,7 @@ import { UserProfile } from './types';
 import Onboarding from './components/Onboarding';
 import Dashboard from './components/Dashboard';
 import { motion, AnimatePresence } from 'motion/react';
+import { useEffect } from 'react';
 
 export default function App() {
   const [profile, setProfile] = useLocalStorage<UserProfile>('studyflow-profile', {
@@ -16,8 +17,18 @@ export default function App() {
     onboarded: false,
   });
 
+  const [theme, setTheme] = useLocalStorage<'light' | 'dark'>('studyflow-colortheme', 'light');
+
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
+
   return (
-    <div className="min-h-screen w-full overflow-hidden bg-slate-900">
+    <div className="min-h-screen w-full overflow-hidden bg-slate-900 text-slate-800 dark:text-slate-100 transition-colors duration-500">
       <AnimatePresence mode="wait">
         {!profile.onboarded ? (
           <motion.div
@@ -36,7 +47,7 @@ export default function App() {
             animate={{ opacity: 1 }}
             className="min-h-screen w-full"
           >
-            <Dashboard profile={profile} setProfile={setProfile} />
+            <Dashboard profile={profile} setProfile={setProfile} theme={theme} setTheme={setTheme} />
           </motion.div>
         )}
       </AnimatePresence>

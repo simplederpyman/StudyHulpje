@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { UserProfile } from '../types';
-import { Settings, Timer, Calendar, Moon, Leaf, Music as MusicIcon } from 'lucide-react';
+import { Settings, Timer, Calendar, Moon, Sun, Leaf, Music as MusicIcon } from 'lucide-react';
 import Pomodoro from './Pomodoro';
 import Planner from './Planner';
 import TaskBreaker from './TaskBreaker';
@@ -12,6 +12,8 @@ import { cn } from '../lib/utils';
 interface Props {
   profile: UserProfile;
   setProfile: (profile: UserProfile) => void;
+  theme: 'light' | 'dark';
+  setTheme: (theme: 'light' | 'dark') => void;
 }
 
 const TABS = [
@@ -41,7 +43,7 @@ const TABS = [
   }
 ];
 
-export default function Dashboard({ profile, setProfile }: Props) {
+export default function Dashboard({ profile, setProfile, theme, setTheme }: Props) {
   const [activeTab, setActiveTab] = useState(TABS[0].id);
 
   const today = new Date().toLocaleDateString('nl-NL', {
@@ -54,6 +56,10 @@ export default function Dashboard({ profile, setProfile }: Props) {
     setProfile({ ...profile, onboarded: false });
   };
 
+  const toggleTheme = () => {
+    setTheme(theme === 'light' ? 'dark' : 'light');
+  };
+
   const activeBg = TABS.find(t => t.id === activeTab)?.bg;
 
   return (
@@ -64,7 +70,7 @@ export default function Dashboard({ profile, setProfile }: Props) {
         style={{ backgroundImage: `url(${activeBg})` }}
       >
         {/* Overlay for readability */}
-        <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-[2px]"></div>
+        <div className="absolute inset-0 bg-slate-900/30 dark:bg-slate-900/60 backdrop-blur-[2px] transition-colors duration-1000"></div>
       </div>
 
       {/* Content Area */}
@@ -72,25 +78,32 @@ export default function Dashboard({ profile, setProfile }: Props) {
         <div className="max-w-5xl mx-auto w-full p-4 md:p-8 flex-1 flex flex-col">
           
           {/* Header */}
-          <header className="flex items-center justify-between bg-white/60 backdrop-blur-xl p-4 rounded-3xl shadow-lg border border-white/40 mb-8">
+          <header className="flex items-center justify-between bg-white/60 dark:bg-black/40 backdrop-blur-2xl p-4 rounded-3xl shadow-lg border border-white/40 dark:border-white/10 mb-8 transition-colors duration-500">
             <div className="flex items-center gap-3">
-              <div className="bg-green-500/20 p-2 rounded-2xl">
-                <Leaf className="w-6 h-6 text-green-700" />
+              <div className="bg-green-500/20 dark:bg-green-500/30 p-2 rounded-2xl">
+                <Leaf className="w-6 h-6 text-green-700 dark:text-green-400" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-slate-800 leading-tight">
+                <h1 className="text-xl font-bold text-slate-800 dark:text-white leading-tight">
                   StudyFlow
                 </h1>
-                <p className="text-slate-600 text-sm capitalize font-medium">{today}</p>
+                <p className="text-slate-600 dark:text-slate-300 text-sm capitalize font-medium">{today}</p>
               </div>
             </div>
-            <div className="flex items-center gap-4">
-              <span className="font-semibold text-slate-700 hidden sm:inline-block bg-white/50 px-4 py-2 rounded-full">
+            <div className="flex items-center gap-3">
+              <span className="font-semibold text-slate-700 dark:text-slate-200 hidden sm:inline-block bg-white/50 dark:bg-black/30 px-4 py-2 rounded-full border border-white/20 dark:border-white/5">
                 Hoi, {profile.name}!
               </span>
               <button 
+                onClick={toggleTheme}
+                className="p-2.5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/80 dark:hover:bg-white/20 bg-white/40 dark:bg-black/30 rounded-full transition-all shadow-sm border border-white/20 dark:border-white/5"
+                title="Wissel Thema"
+              >
+                {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+              </button>
+              <button 
                 onClick={handleLogout}
-                className="p-2.5 text-slate-600 hover:text-slate-900 hover:bg-white/80 bg-white/40 rounded-full transition-all shadow-sm"
+                className="p-2.5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/80 dark:hover:bg-white/20 bg-white/40 dark:bg-black/30 rounded-full transition-all shadow-sm border border-white/20 dark:border-white/5"
                 title="Instellingen / Uitloggen"
               >
                 <Settings className="w-5 h-5" />
@@ -163,7 +176,7 @@ export default function Dashboard({ profile, setProfile }: Props) {
 
       {/* Floating Bottom Navigation */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
-        <div className="bg-white/70 backdrop-blur-2xl p-2 rounded-full shadow-2xl border border-white/50 flex items-center gap-2">
+        <div className="bg-white/70 dark:bg-black/50 backdrop-blur-3xl p-2 rounded-full shadow-2xl border border-white/50 dark:border-white/10 flex items-center gap-2 transition-colors duration-500">
           {TABS.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -174,14 +187,14 @@ export default function Dashboard({ profile, setProfile }: Props) {
                 className={cn(
                   "relative flex items-center gap-2 px-6 py-3 rounded-full transition-all duration-300 font-medium",
                   isActive 
-                    ? "text-slate-900 shadow-sm" 
-                    : "text-slate-500 hover:text-slate-800 hover:bg-white/40"
+                    ? "text-slate-900 dark:text-slate-900 shadow-sm" 
+                    : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/40 dark:hover:bg-white/10"
                 )}
               >
                 {isActive && (
                   <motion.div
                     layoutId="active-tab-bg"
-                    className="absolute inset-0 bg-white rounded-full"
+                    className="absolute inset-0 bg-white dark:bg-white/90 rounded-full"
                     transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                   />
                 )}
