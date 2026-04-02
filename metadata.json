@@ -1,5 +1,5 @@
 {
-  "name": "StudyFlow",
-  "description": "Een interactieve studie-dashboard voor middelbare scholieren met Pomodoro, Focus Garden, en slimme planning.",
+  "name": "StudeerHulpje",
+  "description": "Een premium studie-assistent met Pomodoro timer, AI Study Buddy en een tile-based tuin systeem.",
   "requestFramePermissions": []
 }

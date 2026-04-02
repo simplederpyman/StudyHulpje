@@ -40,7 +40,7 @@ export default function Onboarding({ profile, setProfile }: Props) {
         </div>
         
         <h1 className="text-4xl font-extrabold text-center text-slate-800 dark:text-white mb-3 tracking-tight transition-colors duration-500">
-          StudyFlow
+          StudeerHulpje
         </h1>
         <p className="text-center text-slate-600 dark:text-slate-300 mb-10 font-medium text-lg transition-colors duration-500">
           Vind je focus in de natuur.
