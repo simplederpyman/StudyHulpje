@@ -99,8 +99,8 @@ export default function Dashboard({ profile, setProfile }: Props) {
           </header>
 
           {/* Main Content with AnimatePresence for tab switching */}
-          <main className="flex-1 relative">
-            <AnimatePresence mode="wait">
+          <main className="flex-1 relative grid grid-cols-1 grid-rows-1 items-start">
+            <AnimatePresence>
               {activeTab === 'focus' && (
                 <motion.div
                   key="focus"
@@ -108,7 +108,7 @@ export default function Dashboard({ profile, setProfile }: Props) {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.3 }}
-                  className="max-w-2xl mx-auto w-full"
+                  className="col-start-1 row-start-1 max-w-2xl mx-auto w-full"
                 >
                   <Pomodoro />
                 </motion.div>
@@ -121,23 +121,10 @@ export default function Dashboard({ profile, setProfile }: Props) {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.3 }}
-                  className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+                  className="col-start-1 row-start-1 grid grid-cols-1 lg:grid-cols-2 gap-6 w-full"
                 >
                   <Planner />
                   <TaskBreaker />
-                </motion.div>
-              )}
-
-              {activeTab === 'music' && (
-                <motion.div
-                  key="music"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.3 }}
-                  className="max-w-3xl mx-auto w-full"
-                >
-                  <Music />
                 </motion.div>
               )}
 
@@ -148,12 +135,28 @@ export default function Dashboard({ profile, setProfile }: Props) {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.3 }}
-                  className="max-w-3xl mx-auto w-full"
+                  className="col-start-1 row-start-1 max-w-3xl mx-auto w-full"
                 >
                   <DailyCheckIn />
                 </motion.div>
               )}
             </AnimatePresence>
+
+            {/* Music tab is always mounted to keep Spotify playing */}
+            <motion.div
+              initial={false}
+              animate={{ 
+                opacity: activeTab === 'music' ? 1 : 0, 
+                y: activeTab === 'music' ? 0 : 20,
+                pointerEvents: activeTab === 'music' ? 'auto' : 'none',
+                visibility: activeTab === 'music' ? 'visible' : 'hidden',
+                zIndex: activeTab === 'music' ? 10 : -1
+              }}
+              transition={{ duration: 0.3 }}
+              className="col-start-1 row-start-1 max-w-3xl mx-auto w-full"
+            >
+              <Music />
+            </motion.div>
           </main>
         </div>
       </div>
