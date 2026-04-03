@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { UserProfile } from '../types';
-import { Settings, Timer, Calendar, Moon, Sun, Leaf, Music as MusicIcon, Bot, Sprout, Image as ImageIcon, X } from 'lucide-react';
+import { Settings, Timer, Calendar, Moon, Sun, Leaf, Music as MusicIcon, Sprout, Image as ImageIcon, X } from 'lucide-react';
 import Pomodoro from './Pomodoro';
 import Planner from './Planner';
 import DailyCheckIn from './DailyCheckIn';
 import Music from './Music';
-import StudyBuddy from './StudyBuddy';
 import Garden from './Garden';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
@@ -21,7 +20,6 @@ interface Props {
 const TABS = [
   { id: 'focus', label: 'Focus', icon: Timer },
   { id: 'plan', label: 'Plan', icon: Calendar },
-  { id: 'buddy', label: 'Buddy', icon: Bot },
   { id: 'tuin', label: 'Tuin', icon: Sprout },
   { id: 'music', label: 'Muziek', icon: MusicIcon },
   { id: 'reflect', label: 'Reflect', icon: Moon }
@@ -234,19 +232,6 @@ export default function Dashboard({ profile, setProfile, theme, setTheme }: Prop
                   className="col-start-1 row-start-1 max-w-4xl mx-auto w-full"
                 >
                   <Planner />
-                </motion.div>
-              )}
-
-              {activeTab === 'buddy' && (
-                <motion.div
-                  key="buddy"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.3 }}
-                  className="col-start-1 row-start-1 w-full"
-                >
-                  <StudyBuddy />
                 </motion.div>
               )}
 
