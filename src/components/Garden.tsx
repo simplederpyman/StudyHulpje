@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAppStore, SHOP_ITEMS } from '../store';
+import { useAppStore, SHOP_ITEMS, GardenTile } from '../store';
 import { motion, AnimatePresence } from 'motion/react';
 import { Star, ShoppingBag, X, CheckCircle2, ChevronRight } from 'lucide-react';
 import { cn } from '../lib/utils';
@@ -11,6 +11,19 @@ export default function Garden() {
   const [selectedInventoryItem, setSelectedInventoryItem] = useState<string | null>(null);
   const [receipt, setReceipt] = useState<{ items: {name: string, qty: number, price: number}[], total: number } | null>(null);
 
+  const getPlantVisual = (tile: GardenTile) => {
+    if (!tile.plantId) return null;
+    
+    // Growth stages: 1: Seed, 2: Sprout, 3: Small, 4: Medium, 5: Full
+    const stages = ['🌱', '🌿', '🪴', '🌳', SHOP_ITEMS[tile.plantId].emoji];
+    const emoji = stages[Math.min(tile.stage - 1, stages.length - 1)];
+    
+    // Scale increases with stage
+    const scale = 0.4 + (tile.stage * 0.12);
+    
+    return { emoji, scale };
+  };
+
   const handleTileClick = (tileId: number) => {
     const tile = garden.find(t => t.id === tileId);
     if (!tile) return;
@@ -20,7 +33,7 @@ export default function Garden() {
       if (item.type === 'seed' && !tile.plantId) {
         plantSeed(tileId, selectedInventoryItem);
         setSelectedInventoryItem(null);
-      } else if (item.type === 'upgrade' && tile.plantId && tile.stage === 3) {
+      } else if (item.type === 'upgrade' && tile.plantId && tile.stage === 5) {
         const success = useAppStore.getState().upgradePlant(tileId);
         if (success) {
            confetti({
@@ -31,7 +44,7 @@ export default function Garden() {
            });
            setSelectedInventoryItem(null);
         }
-      } else if (item.type === 'tool' && selectedInventoryItem === 'water' && tile.plantId && tile.stage < 3) {
+      } else if (item.type === 'tool' && selectedInventoryItem === 'water' && tile.plantId) {
         const success = useAppStore.getState().waterPlant(tileId, true);
         if (success) {
           confetti({
@@ -43,7 +56,7 @@ export default function Garden() {
           setSelectedInventoryItem(null);
         }
       }
-    } else if (tile.plantId && tile.stage < 3) {
+    } else if (tile.plantId) {
       // Water plant directly if clicked (costs 1 star)
       const success = useAppStore.getState().waterPlant(tileId, false);
       if (success) {
@@ -163,35 +176,69 @@ export default function Garden() {
                 <>
                   <motion.div
                     initial={{ scale: 0, y: 20 }}
-                    animate={{ scale: 1, y: 0 }}
+                    animate={{ 
+                      scale: getPlantVisual(tile)?.scale || 1, 
+                      y: 0 
+                    }}
                     className={cn(
                       "text-3xl sm:text-5xl md:text-6xl drop-shadow-lg z-10",
                       (tile.level || 1) > 1 && "filter drop-shadow-[0_0_15px_rgba(250,204,21,0.8)]"
                     )}
                     style={{
                       originY: 1,
-                      animation: tile.stage === 3 ? 'sway 3s ease-in-out infinite alternate' : 'none'
+                      animation: tile.stage === 5 ? 'sway 3s ease-in-out infinite alternate' : 'none'
                     }}
                   >
-                    {SHOP_ITEMS[tile.plantId].emoji}
+                    {getPlantVisual(tile)?.emoji}
                   </motion.div>
+                  
+                  {/* Level Badge */}
                   {(tile.level || 1) > 1 && (
                     <div className="absolute top-1 right-1 bg-yellow-400 text-yellow-900 text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm z-20">
                       Lv.{tile.level}
                     </div>
                   )}
-                  {tile.stage < 3 && (
+
+                  {/* Watering Progress Overlay */}
+                  <div className="absolute bottom-1 left-1 right-1 h-1 bg-black/20 rounded-full overflow-hidden z-20">
+                    <motion.div 
+                      className="h-full bg-blue-400"
+                      initial={{ width: 0 }}
+                      animate={{ 
+                        width: tile.stage < 5 
+                          ? `${(tile.waterCount / 3) * 100}%` 
+                          : `${(tile.waterCount / 10) * 100}%` 
+                      }}
+                    />
+                  </div>
+
+                  {/* Interaction Overlays */}
+                  {tile.stage < 5 && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity z-20">
-                      <span className="text-white font-bold text-xs sm:text-sm flex items-center gap-1">
-                        💧 -1 <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                      </span>
+                      <div className="text-center">
+                        <span className="text-white font-bold text-xs sm:text-sm flex items-center gap-1">
+                          💧 -1 <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                        </span>
+                        <p className="text-[10px] text-blue-200 font-bold">{3 - tile.waterCount}x tot groei</p>
+                      </div>
                     </div>
                   )}
-                  {tile.stage === 3 && selectedInventoryItem === 'upgrade_star' && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-yellow-400/40 opacity-0 group-hover:opacity-100 transition-opacity z-20 rounded-xl sm:rounded-3xl">
-                      <span className="text-yellow-900 font-bold text-xs sm:text-sm flex items-center gap-1 bg-yellow-400 px-2 py-1 rounded-full">
-                        ✨ Upgrade
-                      </span>
+                  {tile.stage === 5 && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-yellow-400/20 opacity-0 group-hover:opacity-100 transition-opacity z-20 rounded-xl sm:rounded-3xl">
+                      <div className="text-center">
+                        {selectedInventoryItem === 'upgrade_star' ? (
+                          <span className="text-yellow-900 font-bold text-xs sm:text-sm flex items-center gap-1 bg-yellow-400 px-2 py-1 rounded-full">
+                            ✨ Upgrade
+                          </span>
+                        ) : (
+                          <>
+                            <span className="text-white font-bold text-xs sm:text-sm flex items-center gap-1">
+                              💧 -1 <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                            </span>
+                            <p className="text-[10px] text-yellow-200 font-bold">{10 - tile.waterCount}x tot Lv.{ (tile.level || 1) + 1 }</p>
+                          </>
+                        )}
+                      </div>
                     </div>
                   )}
                 </>

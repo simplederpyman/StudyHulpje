@@ -11,10 +11,11 @@ export interface StudySession {
 export interface GardenTile {
   id: number;
   plantId: string | null;
-  stage: number; // 0: empty, 1: seed, 2: sprout, 3: full
+  stage: number; // 0: empty, 1: seed, 2: sprout, 3: small, 4: medium, 5: full
   plantedAt: number | null;
   lastWatered: number | null;
   level?: number;
+  waterCount: number; // Progress towards next stage or level
 }
 
 export interface ShopItem {
@@ -67,6 +68,7 @@ export const useAppStore = create<AppState>()(
         plantedAt: null,
         lastWatered: null,
         level: 1,
+        waterCount: 0,
       })),
       sessions: [],
       background: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=2532&auto=format&fit=crop',
@@ -102,6 +104,7 @@ export const useAppStore = create<AppState>()(
             stage: 1,
             plantedAt: Date.now(),
             level: 1,
+            waterCount: 0,
           };
           return {
             garden: newGarden,
@@ -118,33 +121,56 @@ export const useAppStore = create<AppState>()(
         const state = get();
         const tile = state.garden[tileId];
         
-        if (tile && tile.plantId && tile.stage < 3) {
-          if (useInventoryItem && (state.inventory['water'] || 0) > 0) {
+        if (tile && tile.plantId) {
+          const canWater = useInventoryItem ? (state.inventory['water'] || 0) > 0 : state.stars >= 1;
+          
+          if (canWater) {
             const newGarden = [...state.garden];
-            newGarden[tileId] = {
-              ...tile,
-              stage: tile.stage + 1,
-              lastWatered: Date.now(),
-            };
-            set({
-              garden: newGarden,
-              inventory: {
-                ...state.inventory,
-                ['water']: state.inventory['water'] - 1
-              }
-            });
-            return true;
-          } else if (!useInventoryItem && state.stars >= 1) {
-            const newGarden = [...state.garden];
-            newGarden[tileId] = {
-              ...tile,
-              stage: tile.stage + 1,
-              lastWatered: Date.now(),
-            };
-            set({
-              garden: newGarden,
-              stars: state.stars - 1,
-            });
+            const nextWaterCount = (tile.waterCount || 0) + 1;
+            let nextStage = tile.stage;
+            let nextLevel = tile.level || 1;
+            
+            // Growth logic: Every 3 waterings = next stage (up to 5)
+            if (nextStage < 5 && nextWaterCount >= 3) {
+              nextStage += 1;
+              // Reset waterCount when moving to next stage
+              newGarden[tileId] = {
+                ...tile,
+                stage: nextStage,
+                waterCount: 0,
+                lastWatered: Date.now(),
+              };
+            } else if (nextStage === 5 && nextWaterCount >= 10) {
+              // Leveling logic: Every 10 waterings at max stage = level up
+              nextLevel += 1;
+              newGarden[tileId] = {
+                ...tile,
+                level: nextLevel,
+                waterCount: 0,
+                lastWatered: Date.now(),
+              };
+            } else {
+              newGarden[tileId] = {
+                ...tile,
+                waterCount: nextWaterCount,
+                lastWatered: Date.now(),
+              };
+            }
+
+            if (useInventoryItem) {
+              set({
+                garden: newGarden,
+                inventory: {
+                  ...state.inventory,
+                  ['water']: state.inventory['water'] - 1
+                }
+              });
+            } else {
+              set({
+                garden: newGarden,
+                stars: state.stars - 1,
+              });
+            }
             return true;
           }
         }
@@ -154,8 +180,8 @@ export const useAppStore = create<AppState>()(
       upgradePlant: (tileId) => {
         const state = get();
         const tile = state.garden[tileId];
-        // Upgrade requires stage 3 and an upgrade_star in inventory
-        if (tile && tile.plantId && tile.stage === 3 && (state.inventory['upgrade_star'] || 0) > 0) {
+        // Upgrade requires stage 5 and an upgrade_star in inventory
+        if (tile && tile.plantId && tile.stage === 5 && (state.inventory['upgrade_star'] || 0) > 0) {
           const newGarden = [...state.garden];
           newGarden[tileId] = {
             ...tile,
@@ -182,7 +208,7 @@ export const useAppStore = create<AppState>()(
           },
           ...state.sessions
         ],
-        stars: state.stars + 1 // Earn 1 star per session
+        stars: state.stars + (session.duration * 5) // Earn 5 stars per minute
       })),
 
       setBackground: (bg) => set({ background: bg }),

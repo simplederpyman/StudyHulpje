@@ -368,7 +368,7 @@ export default function Pomodoro() {
               </div>
               
               <p className="text-slate-600 dark:text-slate-300 mb-6 font-medium">
-                Goed gedaan! Je hebt ⭐ 1 verdiend. Wat heb je precies gedaan tijdens deze sessie?
+                Goed gedaan! Je hebt ⭐ {duration * 5} verdiend. Wat heb je precies gedaan tijdens deze sessie?
               </p>
               
               <input
