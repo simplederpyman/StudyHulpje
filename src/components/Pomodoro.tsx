@@ -7,7 +7,7 @@ import { cn } from '../lib/utils';
 import confetti from 'canvas-confetti';
 import { useAppStore } from '../store';
 
-const POMODORO_TIME = 25 * 60;
+const DEFAULT_TIME = 25 * 60;
 const LEAVE_PENALTY_TIME = 30; // 30 seconds
 
 // Emojis for plant stages
@@ -22,8 +22,11 @@ const TIPS = [
 ];
 
 export default function Pomodoro() {
-  const [timeLeft, setTimeLeft] = useState(POMODORO_TIME);
+  const [timeLeft, setTimeLeft] = useState(DEFAULT_TIME);
+  const [duration, setDuration] = useState(25); // in minutes
   const [isActive, setIsActive] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [inputMinutes, setInputMinutes] = useState('25');
   const [plantStage, setPlantStage] = useState(0);
   const [sound, setSound] = useState<'silence' | 'rain' | 'coffee'>('silence');
   const [visibility, setVisibility] = useState<DocumentVisibilityState>('visible');
@@ -54,7 +57,7 @@ export default function Pomodoro() {
         if (time <= 1) {
           setIsActive(false);
           handleComplete();
-          return POMODORO_TIME;
+          return duration * 60;
         }
         return time - 1;
       });
@@ -89,7 +92,7 @@ export default function Pomodoro() {
     if (taskName.trim()) {
       addSession({
         task: taskName,
-        duration: 25
+        duration: duration
       });
       setTaskName('');
       setShowCompletionModal(false);
@@ -102,7 +105,19 @@ export default function Pomodoro() {
 
   const resetTimer = () => {
     setIsActive(false);
-    setTimeLeft(POMODORO_TIME);
+    setTimeLeft(duration * 60);
+  };
+
+  const handleTimeSubmit = () => {
+    const mins = parseInt(inputMinutes);
+    if (!isNaN(mins) && mins > 0 && mins <= 120) {
+      setDuration(mins);
+      setTimeLeft(mins * 60);
+      setIsEditing(false);
+    } else {
+      setInputMinutes(duration.toString());
+      setIsEditing(false);
+    }
   };
 
   const formatTime = (seconds: number) => {
@@ -180,9 +195,30 @@ export default function Pomodoro() {
 
       {/* Timer */}
       <div className="text-center mb-6">
-        <div className="text-7xl md:text-8xl font-bold text-slate-800 dark:text-white font-mono tracking-tighter mb-2 drop-shadow-sm transition-colors duration-500">
-          {formatTime(timeLeft)}
-        </div>
+        {isEditing && !isActive ? (
+          <div className="flex flex-col items-center mb-2">
+            <input
+              type="number"
+              value={inputMinutes}
+              onChange={(e) => setInputMinutes(e.target.value)}
+              onBlur={handleTimeSubmit}
+              onKeyDown={(e) => e.key === 'Enter' && handleTimeSubmit()}
+              className="text-7xl md:text-8xl font-bold text-slate-800 dark:text-white font-mono tracking-tighter bg-transparent border-b-4 border-green-500 outline-none w-48 text-center"
+              autoFocus
+              min="1"
+              max="120"
+            />
+            <p className="text-xs text-slate-500 mt-2">Druk op Enter om op te slaan (1-120 min)</p>
+          </div>
+        ) : (
+          <div 
+            className="text-7xl md:text-8xl font-bold text-slate-800 dark:text-white font-mono tracking-tighter mb-2 drop-shadow-sm transition-colors duration-500 cursor-pointer hover:text-green-600 dark:hover:text-green-400"
+            onClick={() => !isActive && setIsEditing(true)}
+            title={!isActive ? "Klik om tijd aan te passen" : ""}
+          >
+            {formatTime(timeLeft)}
+          </div>
+        )}
         <p className="text-slate-600 dark:text-slate-300 font-medium bg-white/40 dark:bg-black/30 px-4 py-1.5 rounded-full inline-block backdrop-blur-sm border border-white/20 dark:border-white/5 transition-colors duration-500">
           {isActive ? 'Blijf gefocust...' : 'Klaar om te starten?'}
         </p>
